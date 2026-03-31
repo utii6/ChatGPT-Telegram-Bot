@@ -21,9 +21,9 @@ RESET_TIME = int(os.environ.get('RESET_TIME', '3600'))
 if RESET_TIME < 60:
     RESET_TIME = 60
 
-BASE_URL = os.environ.get('BASE_URL', 'https://api.openai.com/v1/chat/completions')
+BASE_URL = os.environ.get('BASE_URL', 'https://openrouter.ai/api/v1')
 API_KEY = os.environ.get('API_KEY', None)
-MODEL = os.environ.get('MODEL', 'gpt-5')
+MODEL = os.environ.get('MODEL', 'google/gemini-2.0-flash-lite-preview-02-05:free')
 
 WEB_HOOK = os.environ.get('WEB_HOOK', None)
 CHAT_MODE = os.environ.get('CHAT_MODE', "global")
@@ -61,6 +61,7 @@ LANGUAGES = {
     "Simplified Chinese": False,
     "Traditional Chinese": False,
     "Russian": False,
+    "Arabic": False,
 }
 
 LANGUAGES_TO_CODE = {
@@ -68,7 +69,9 @@ LANGUAGES_TO_CODE = {
     "Simplified Chinese": "zh",
     "Traditional Chinese": "zh-hk",
     "Russian": "ru",
+    "Arabic": "ar",
 }
+
 
 current_date = datetime.now()
 Current_Date = current_date.strftime("%Y-%m-%d")
