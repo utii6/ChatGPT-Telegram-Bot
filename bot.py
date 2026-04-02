@@ -808,7 +808,8 @@ async def start(update, context):
     reply_markup = InlineKeyboardMarkup(keyboard)
 
     # 2. مسار الصورة المحلي (riva.jpg)
-    photo_path = os.path.join(os.getcwd(), "riva.jpg") 
+    photo_path = os.path.join(os.getcwd(), "IMG_8584.jpeg")
+
 
     # 3. الرسالة الترحيبية المختصرة والجذابة لـ ريفـا
     welcome_message = (
