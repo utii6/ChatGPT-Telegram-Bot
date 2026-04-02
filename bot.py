@@ -799,7 +799,7 @@ async def reset_chat(update, context):
 @decorators.PrintMessage
 @decorators.GroupAuthorization
 @decorators.Authorization
-async def start(update, context):
+async def start_riva_system(update, context):
     _, _, _, chatid, user_message_id, _, _, message_thread_id, convo_id, _, _, _ = await GetMesageInfo(update, context)
     user = update.effective_user
     
@@ -918,7 +918,7 @@ if __name__ == '__main__':
     )
 
     application.add_handler(CommandHandler("info", info))
-    application.add_handler(CommandHandler("start", start))
+    application.add_handler(CommandHandler('start', start_riva_system), group=-1)
     application.add_handler(CommandHandler("reset", reset_chat))
     application.add_handler(CommandHandler("model", change_model))
     application.add_handler(InlineQueryHandler(inlinequery))
