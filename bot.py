@@ -878,23 +878,22 @@ async def error(update, context):
     logger.warning('Update "%s" caused error "%s"', update, context.error)
     logger.warning('Error traceback: %s', ''.join(traceback_string))
 
-@decorators.GroupAuthorization
-@decorators.Authorization
-async def unknown(update, context): # 当用户输入未知命令时，返回文本
-    return
-    # await context.bot.send_message(chat_id=update.effective_chat.id, text="Sorry, I didn't understand that command.")
-
 async def post_init(application: Application) -> None:
     if GET_MODELS:
         await get_initial_model()
+    
+    # 1. تحديث قائمة الأوامر (تظهر للمستخدم عند كتابة /)
     await application.bot.set_my_commands([
-        BotCommand('info', 'Basic information'),
-        BotCommand('reset', 'Reset the bot'),
-        BotCommand('start', 'Start the bot'),
-        BotCommand('model', 'Change AI model'),
+        BotCommand('info', 'إعدادات البوت ⚙️'),
+        BotCommand('reset', 'حـذف محادثاتك🔄'),
+        BotCommand('start', 'أبدأ مع ريڤـا🚀'),
+        BotCommand('model', 'تغيير مود ريڤـا  🤖'),
     ])
+
+    # 2. تحديث وصف البوت (النص الذي يظهر قبل البدء)
     description = (
-        "I am an Assistant, a large language model trained by OpenAI. I will do my best to help answer your questions."
+        "ريفـا (Riva): مساعدك الذكي فائق السرعة 🚀\n"
+        "متخصص في الدردشة السرية، تعديل الصور، مساعدة الطلاب، وحلول البرمجيات بذكاء اصطناعي متطور."
     )
     await application.bot.set_my_description(description)
 
