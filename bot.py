@@ -796,47 +796,52 @@ async def reset_chat(update, context):
         config.initial_model = remove_no_text_model(await update_initial_model(provider))
     await delete_message(update, context, [message.message_id, user_message_id])
 
-@decorators.AdminAuthorization
-@decorators.GroupAuthorization
-@decorators.Authorization
-async def info(update, context):
-    _, _, _, chatid, user_message_id, _, _, message_thread_id, convo_id, _, _, voice_text = await GetMesageInfo(update, context)
-    info_message = update_info_message(convo_id)
-    message = await context.bot.send_message(
-        chat_id=chatid,
-        message_thread_id=message_thread_id,
-        text=escape(info_message, italic=False),
-        reply_markup=InlineKeyboardMarkup(update_first_buttons_message(convo_id)),
-        parse_mode='MarkdownV2',
-        disable_web_page_preview=True,
-        read_timeout=600,
-    )
-    await delete_message(update, context, [message.message_id, user_message_id])
-
 @decorators.PrintMessage
 @decorators.GroupAuthorization
 @decorators.Authorization
-async def start(update, context): # 当用户输入/start时，返回文本
-    _, _, _, _, _, _, _, _, convo_id, _, _, _ = await GetMesageInfo(update, context)
+async def start(update, context):
+    _, _, _, chatid, user_message_id, _, _, message_thread_id, convo_id, _, _, _ = await GetMesageInfo(update, context)
     user = update.effective_user
-    if user.language_code == "zh-hans":
-        update_language_status("Simplified Chinese", chat_id=convo_id)
-    elif user.language_code == "zh-hant":
-        update_language_status("Traditional Chinese", chat_id=convo_id)
-    elif user.language_code == "ru":
-        update_language_status("Russian", chat_id=convo_id)
-    else:
-        update_language_status("English", chat_id=convo_id)
-    message = (
-        f"Hi `{user.username}` ! I am an Assistant, a large language model trained by OpenAI. I will do my best to help answer your questions.\n\n"
+    
+    # 1. إعداد زر واحد فقط (الدعم الفني) كما طلبت
+    keyboard = [[InlineKeyboardButton("𝐃𝐄𝐕ッ👨‍💻", url="https://t.me/E2E12")]]
+    reply_markup = InlineKeyboardMarkup(keyboard)
+
+    # 2. مسار الصورة المحلي (riva.jpg)
+    photo_path = os.path.join(os.getcwd(), "riva.jpg") 
+
+    # 3. الرسالة الترحيبية المختصرة والجذابة لـ ريفـا
+    welcome_message = (
+        f"👋 أهلاً بك يا `{user.username}` في عالم ريفـا (Riva)!\n\n"
+        "🚀 *سرعة وكفاءة* لا تضاهى في التنفيذ\n"
+        "🔐 *محادثات سرية* وخصوصية تامة وآمنة\n\n"
+        "✨ *ماذا تقـدم لك ريفـا؟*\n"
+        "🎨 تعديل الصور باحترافية عالية\n"
+        "💻 حلول برمجية وكتابة الأكواد\n"
+        "📚 مساعدة ذكية وشاملة للطلاب\n\n"
+        "⚡️ *ريفـا.. القوة والسرعة في مساعد واحد!*"
     )
-    if len(context.args) == 2 and context.args[1].startswith("sk-"):
-        api_url = context.args[0]
-        api_key = context.args[1]
-        Users.set_config(convo_id, "api_key", api_key)
-        Users.set_config(convo_id, "api_url", api_url)
-        # if GET_MODELS:
-        #     update_initial_model()
+
+    try:
+        if os.path.exists(photo_path):
+            with open(photo_path, 'rb') as photo:
+                await context.bot.send_photo(
+                    chat_id=chatid,
+                    photo=photo,
+                    caption=escape(welcome_message, italic=False),
+                    reply_markup=reply_markup,
+                    parse_mode='MarkdownV2',
+                    message_thread_id=message_thread_id
+                )
+        else:
+            await update.message.reply_text(
+                text=escape(welcome_message, italic=False),
+                reply_markup=reply_markup,
+                parse_mode='MarkdownV2'
+            )
+    except Exception as e:
+        logger.error(f"Error in Riva Start: {e}")
+
 
     if len(context.args) == 1 and context.args[0].startswith("sk-"):
         api_key = context.args[0]
