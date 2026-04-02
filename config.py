@@ -107,21 +107,35 @@ def file_lock(filename):
             finally:
                 fcntl.flock(f, fcntl.LOCK_UN)
 
+from supabase import create_client, Client
+
+# جلب بيانات الاتصال من Environment Variables في ريندر
+SUPABASE_URL = os.environ.get("SUPABASE_URL")
+SUPABASE_KEY = os.environ.get("SUPABASE_KEY")
+supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
+
 def save_user_config(user_id, config):
-    if not os.path.exists(CONFIG_DIR):
-        os.makedirs(CONFIG_DIR)
-
-    filename = os.path.join(CONFIG_DIR, f'{user_id}.json')
-
-    with file_lock(filename):
-        with open(filename, 'w') as f:
-            json.dump(config, f, indent=2, ensure_ascii=False)
+    # بدلاً من إنشاء مجلد وملفات، نرسل البيانات مباشرة لـ Supabase
+    try:
+        supabase.table("bot_configs").upsert({
+            "user_id": str(user_id),
+            "config_data": config
+        }).execute()
+    except Exception as e:
+        print(f"Error saving to Supabase: {e}")
 
 def load_user_config(user_id):
-    filename = os.path.join(CONFIG_DIR, f'{user_id}.json')
+    # بدلاً من التأكد من وجود الملف، نسأل قاعدة البيانات
+    try:
+        response = supabase.table("bot_configs").select("config_data").eq("user_id", str(user_id)).execute()
+        if response.data:
+            return response.data[0]['config_data']
+    except Exception as e:
+        print(f"Error loading from Supabase: {e}")
+    
+    # إذا لم يجد بيانات (مستخدم جديد)، نرجع قاموساً فارغاً كما كان يفعل الكود القديم
+    return {}
 
-    if not os.path.exists(filename):
-        return {}
 
     with file_lock(filename):
         with open(filename, 'r') as f:
